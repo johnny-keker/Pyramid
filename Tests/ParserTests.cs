@@ -52,5 +52,13 @@ namespace Tests
             parser = new Parser($"{arg} >> 4");
             Assert.Equal(0b_1101_1110_1010, parser.Evaluate());
         }
+
+        [Fact]
+        public void OperatorPrecedenceTest()
+        {
+            var parser = new Parser("4200 & 39 + 313000 & 255 >> 1 & 70");
+            var res = 4200 & 39 + 313000 & 255 >> 1 & 70;
+            Assert.Equal(res, parser.Evaluate());
+        }
     }
 }

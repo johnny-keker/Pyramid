@@ -7,7 +7,8 @@ namespace Pyramid
         private Lexer _lexer;
 
         /*
-         * expr     : sum ((>> | <<) sum)*
+         * expr     : shift (& shift)*
+         * shift    : sum ((>> | <<) sum)*
          * sum      : mul ((+ | -) mul)*
          * mul      : factor ((* | /) factor)*
          * factor   : INTEGER | LPAREN sum RPAREN
@@ -31,18 +32,6 @@ namespace Pyramid
             return new IntNode(value);
         }
 
-        private Node Sum()
-        {
-            var node = Mul();
-
-            if (_lexer.TryReadChar('+'))
-                return new PlusNode(node, Mul());
-            else if (_lexer.TryReadChar('-'))
-                return new MinusNode(node, Mul());
-            else
-                return node;
-        }
-
         private Node Mul()
         {
             var node = Factor();
@@ -55,7 +44,19 @@ namespace Pyramid
                 return node;
         }
 
-        private Node Expression()
+        private Node Sum()
+        {
+            var node = Mul();
+
+            if (_lexer.TryReadChar('+'))
+                return new PlusNode(node, Mul());
+            else if (_lexer.TryReadChar('-'))
+                return new MinusNode(node, Mul());
+            else
+                return node;
+        }
+
+        private Node Shift()
         {
             var node = Sum();
 
@@ -65,6 +66,15 @@ namespace Pyramid
                 return new BitwiseShiftNode(node, Sum(), false);
             else
                 return node;
+        }
+
+        private Node Expression()
+        {
+            var node = Shift();
+
+            while (_lexer.TryReadChar('&'))
+                node = new AndNode(node, Shift());
+            return node;
         }
 
         public Node Parse() => Expression();
