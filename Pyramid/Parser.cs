@@ -7,9 +7,9 @@ namespace Pyramid
         private Lexer _lexer;
 
         /*
-         * sum      : shift ((PLUS | MINUS) shift)*
-         * shift    : term ((>> | <<) term)*
-         * term     : factor ((MUL | DIV) factor)*
+         * expr     : sum ((>> | <<) sum)*
+         * sum      : mul ((+ | -) mul)*
+         * mul      : factor ((* | /) factor)*
          * factor   : INTEGER | LPAREN sum RPAREN
          */
         public Parser(string text)
@@ -17,12 +17,11 @@ namespace Pyramid
             _lexer = new Lexer(text);
         }
 
-        // factor : INTEGER | LPAREN sum RPAREN
         private Node Factor()
         {
             if (_lexer.TryReadChar('('))
             {
-                var factor = Sum();
+                var factor = Expression();
                 if (!_lexer.TryReadChar(')'))
                     throw new ArgumentException("Invalid parentheses placing");
                 return factor;
@@ -32,8 +31,19 @@ namespace Pyramid
             return new IntNode(value);
         }
 
-        // term : factor ((MUL | DIV) factor)*
-        private Node Term()
+        private Node Sum()
+        {
+            var node = Mul();
+
+            if (_lexer.TryReadChar('+'))
+                return new PlusNode(node, Mul());
+            else if (_lexer.TryReadChar('-'))
+                return new MinusNode(node, Mul());
+            else
+                return node;
+        }
+
+        private Node Mul()
         {
             var node = Factor();
 
@@ -45,34 +55,20 @@ namespace Pyramid
                 return node;
         }
 
-        // shift : term ((>> | <<) term)*
-        private Node Shift()
+        private Node Expression()
         {
-            var node = Term();
+            var node = Sum();
 
             if (_lexer.TryReadChar('>') && _lexer.TryReadChar('>'))
-                return new BitwiseShiftNode(node, Term());
+                return new BitwiseShiftNode(node, Sum());
             else if (_lexer.TryReadChar('<') && _lexer.TryReadChar('<'))
-                return new BitwiseShiftNode(node, Term(), false);
+                return new BitwiseShiftNode(node, Sum(), false);
             else
                 return node;
         }
 
-        // sum   : shift ((PLUS | MINUS) shift)*
-        private Node Sum()
-        {
-            var node = Shift();
+        public Node Parse() => Expression();
 
-            if (_lexer.TryReadChar('+'))
-                return new PlusNode(node, Term());
-            else if (_lexer.TryReadChar('-'))
-                return new MinusNode(node, Term());
-            else
-                return node;
-        }
-
-        public Node Parse() => Sum();
-
-        public int Evaluate() => Sum().Compute();
+        public int Evaluate() => Expression().Compute();
     }
 }
