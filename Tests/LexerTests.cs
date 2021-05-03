@@ -11,25 +11,19 @@ namespace Tests
         {
             var lexer = new Lexer("    42    + 313");
 
-            var next = lexer.Next();
-            Assert.Equal(TokenType.INT, next.Type);
-            Assert.Equal("42", next.Value);
+            var isInt = lexer.TryReadInt(out var factor);
+            Assert.True(isInt);
+            Assert.Equal(42, factor);
 
-            next = lexer.Next();
-            Assert.Equal(TokenType.PLUS, next.Type);
-            Assert.Equal("+", next.Value);
+            Assert.False(lexer.TryReadChar('-'));
+            Assert.True(lexer.TryReadChar('+'));
 
-            next = lexer.Next();
-            Assert.Equal(TokenType.INT, next.Type);
-            Assert.Equal("313", next.Value);
+            isInt = lexer.TryReadInt(out factor);
+            Assert.True(isInt);
+            Assert.Equal(313, factor);
 
-            next = lexer.Next();
-            Assert.Equal(TokenType.EOF, next.Type);
-            Assert.Null(next.Value);
-
-            next = lexer.Next();
-            Assert.Equal(TokenType.EOF, next.Type);
-            Assert.Null(next.Value);
+            Assert.False(lexer.TryReadChar('-'));
+            Assert.False(lexer.TryReadChar('+'));
         }
     }
 }
