@@ -1,25 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pyramid
 {
-    public class Node
-    {
-        public Token Token { get; }
-        public Node Left;
-        public Node Right;
-
-        public Node(Token token, Node left = null, Node right = null)
-        {
-            Token = token;
-            Left = left;
-            Right = right;
-        }
-    }
-
     public class Parser
     {
         private Lexer _lexer;
@@ -46,7 +28,7 @@ namespace Pyramid
                 throw new ArgumentException(); // TODO: handle brackets
             var token = _currentToken;
             Eat(TokenType.INT);
-            return new Node(token);
+            return new IntNode(int.Parse(token.Value));
         }
 
         // term : factor ((MUL | DIV) factor)*
@@ -58,10 +40,15 @@ namespace Pyramid
             {
                 var token = _currentToken;
                 if (token.Type == TokenType.MUL)
+                {
                     Eat(TokenType.MUL);
+                    node = new MulNode(node, Factor());
+                }
                 else if (token.Type == TokenType.DIV)
+                {
                     Eat(TokenType.DIV);
-                node = new Node(token, node, Factor());
+                    node = new DivNode(node, Factor());
+                }
             }
 
             return node;
@@ -76,10 +63,15 @@ namespace Pyramid
             {
                 var token = _currentToken;
                 if (token.Type == TokenType.PLUS)
+                {
                     Eat(TokenType.PLUS);
+                    node = new PlusNode(node, Term());
+                }
                 else if (token.Type == TokenType.MINUS)
+                {
                     Eat(TokenType.MINUS);
-                node = new Node(token, node, Term());
+                    node = new MinusNode(node, Term());
+                }
             }
 
             return node;
@@ -87,25 +79,6 @@ namespace Pyramid
 
         public Node Parse() => Expression();
 
-        private int ProcessNode(Node node)
-        {
-            switch (node.Token.Type)
-            {
-                case TokenType.INT:
-                    return int.Parse(node.Token.Value);
-                case TokenType.PLUS:
-                    return ProcessNode(node.Left) + ProcessNode(node.Right);
-                case TokenType.MINUS:
-                    return ProcessNode(node.Left) - ProcessNode(node.Right);
-                case TokenType.MUL:
-                    return ProcessNode(node.Left) * ProcessNode(node.Right);
-                case TokenType.DIV:
-                    return ProcessNode(node.Left) / ProcessNode(node.Right);
-                default:
-                    throw new ArgumentException($"Unknown Token: {node.Token}");
-            }
-        }
-
-        public int Evaluate() => ProcessNode(Expression());
+        public int Evaluate() => Expression().Compute();
     }
 }

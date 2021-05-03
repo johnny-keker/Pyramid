@@ -12,11 +12,13 @@ namespace Tests
             var parser = new Parser("    42    + 313");
             var ast = parser.Parse();
 
-            Assert.Equal(TokenType.PLUS, ast.Token.Type);
-            Assert.Equal(TokenType.INT, ast.Left.Token.Type);
-            Assert.Equal("42", ast.Left.Token.Value);
-            Assert.Equal(TokenType.INT, ast.Right.Token.Type);
-            Assert.Equal("313", ast.Right.Token.Value);
+            Assert.True(ast is PlusNode);
+
+            Assert.True(ast.Left is IntNode);
+            Assert.Equal(42, ((IntNode)ast.Left).Value);
+
+            Assert.True(ast.Right is IntNode);
+            Assert.Equal(313, ((IntNode)ast.Right).Value);
 
             Assert.Null(ast.Left.Left);
             Assert.Null(ast.Left.Right);
