@@ -14,8 +14,15 @@ namespace Pyramid
         // factor : INTEGER | LPAREN expr RPAREN
         private Node Factor()
         {
+            if (_lexer.TryReadChar('('))
+            {
+                var factor = Expression();
+                if (!_lexer.TryReadChar(')'))
+                    throw new ArgumentException("Invalid parentheses placing");
+                return factor;
+            }
             if (!_lexer.TryReadInt(out var value))
-                throw new ArgumentException(); // TODO: handle brackets
+                throw new ArgumentException();
             return new IntNode(value);
         }
 

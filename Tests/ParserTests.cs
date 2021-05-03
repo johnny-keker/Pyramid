@@ -33,5 +33,13 @@ namespace Tests
 
             Assert.Equal(981, parser.Evaluate());
         }
+
+        [Fact]
+        public void ParenthesesTest()
+        {
+            var parser = new Parser("     (      42    +313  )   * 3");
+
+            Assert.Equal(1065, parser.Evaluate());
+        }
     }
 }
