@@ -41,5 +41,16 @@ namespace Tests
 
             Assert.Equal(1065, parser.Evaluate());
         }
+
+        [Fact]
+        public void BitwiseShiftTest()
+        {
+            var arg = 0b_1101_1110_1010_1101;
+            var parser = new Parser($"{arg} << 4");
+            Assert.Equal(0b_1101_1110_1010_1101_0000, parser.Evaluate());
+
+            parser = new Parser($"{arg} >> 4");
+            Assert.Equal(0b_1101_1110_1010, parser.Evaluate());
+        }
     }
 }

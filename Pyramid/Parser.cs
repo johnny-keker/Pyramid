@@ -6,17 +6,23 @@ namespace Pyramid
     {
         private Lexer _lexer;
 
+        /*
+         * sum      : shift ((PLUS | MINUS) shift)*
+         * shift    : term ((>> | <<) term)*
+         * term     : factor ((MUL | DIV) factor)*
+         * factor   : INTEGER | LPAREN sum RPAREN
+         */
         public Parser(string text)
         {
             _lexer = new Lexer(text);
         }
 
-        // factor : INTEGER | LPAREN expr RPAREN
+        // factor : INTEGER | LPAREN sum RPAREN
         private Node Factor()
         {
             if (_lexer.TryReadChar('('))
             {
-                var factor = Expression();
+                var factor = Sum();
                 if (!_lexer.TryReadChar(')'))
                     throw new ArgumentException("Invalid parentheses placing");
                 return factor;
@@ -39,10 +45,23 @@ namespace Pyramid
                 return node;
         }
 
-        // expr   : term ((PLUS | MINUS) term)*
-        private Node Expression()
+        // shift : term ((>> | <<) term)*
+        private Node Shift()
         {
             var node = Term();
+
+            if (_lexer.TryReadChar('>') && _lexer.TryReadChar('>'))
+                return new BitwiseShiftNode(node, Term());
+            else if (_lexer.TryReadChar('<') && _lexer.TryReadChar('<'))
+                return new BitwiseShiftNode(node, Term(), false);
+            else
+                return node;
+        }
+
+        // sum   : shift ((PLUS | MINUS) shift)*
+        private Node Sum()
+        {
+            var node = Shift();
 
             if (_lexer.TryReadChar('+'))
                 return new PlusNode(node, Term());
@@ -52,8 +71,8 @@ namespace Pyramid
                 return node;
         }
 
-        public Node Parse() => Expression();
+        public Node Parse() => Sum();
 
-        public int Evaluate() => Expression().Compute();
+        public int Evaluate() => Sum().Compute();
     }
 }

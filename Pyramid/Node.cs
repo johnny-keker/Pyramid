@@ -76,4 +76,23 @@
 
         public int Compute() => Left.Compute() / Right.Compute();
     }
+
+    public class BitwiseShiftNode : Node
+    {
+        public Node Left { get; }
+        public Node Right { get; }
+
+        public bool RightDirection { get; }
+
+        public BitwiseShiftNode(Node left, Node right, bool rightDir = true)
+        {
+            Left = left;
+            Right = right;
+            RightDirection = rightDir;
+        }
+
+        public int Compute() => RightDirection
+            ? Left.Compute() >> Right.Compute()
+            : Left.Compute() << Right.Compute();
+    }
 }
