@@ -7,7 +7,9 @@ namespace Pyramid
         private Lexer _lexer;
 
         /*
-         * expr     : shift (& shift)*
+         * or       : xor (| xor)
+         * xor      : and (^ and)*
+         * and      : shift (& shift)*
          * shift    : sum ((>> | <<) sum)*
          * sum      : mul ((+ | -) mul)*
          * mul      : factor ((* | /) factor)*
@@ -68,12 +70,30 @@ namespace Pyramid
                 return node;
         }
 
-        private Node Expression()
+        private Node And()
         {
             var node = Shift();
 
             while (_lexer.TryReadChar('&'))
                 node = new AndNode(node, Shift());
+            return node;
+        }
+
+        private Node Xor()
+        {
+            var node = And();
+
+            while (_lexer.TryReadChar('^'))
+                node = new XorNode(node, And());
+            return node;
+        }
+
+        private Node Expression()
+        {
+            var node = Xor();
+
+            while (_lexer.TryReadChar('|'))
+                node = new OrNode(node, Xor());
             return node;
         }
 

@@ -56,8 +56,8 @@ namespace Tests
         [Fact]
         public void OperatorPrecedenceTest()
         {
-            var parser = new Parser("4200 & 39 + 313000 & 255 >> 1 & 70");
-            var res = 4200 & 39 + 313000 & 255 >> 1 & 70;
+            var parser = new Parser("(4200 & 39 + 313000 & 255 >> 1 & 70) | 32 ^ 15 & 10 + 3 << 2");
+            var res = (4200 & 39 + 313000 & 255 >> 1 & 70) | 32 ^ 15 & 10 + 3 << 2;
             Assert.Equal(res, parser.Evaluate());
         }
     }

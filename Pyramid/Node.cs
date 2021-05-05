@@ -109,4 +109,32 @@
 
         public int Compute() => Left.Compute() & Right.Compute();
     }
+
+    public class XorNode : Node
+    {
+        public Node Left { get; }
+        public Node Right { get; }
+
+        public XorNode(Node left, Node right)
+        {
+            Left = left;
+            Right = right;
+        }
+
+        public int Compute() => Left.Compute() ^ Right.Compute();
+    }
+
+    public class OrNode : Node
+    {
+        public Node Left { get; }
+        public Node Right { get; }
+
+        public OrNode(Node left, Node right)
+        {
+            Left = left;
+            Right = right;
+        }
+
+        public int Compute() => Left.Compute() | Right.Compute();
+    }
 }
