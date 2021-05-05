@@ -59,6 +59,30 @@ namespace Tests
             var parser = new Parser("(4200 & 39 + 313000 & 255 >> 1 & 70) | 32 ^ 15 & 10 + 3 << 2");
             var res = (4200 & 39 + 313000 & 255 >> 1 & 70) | 32 ^ 15 & 10 + 3 << 2;
             Assert.Equal(res, parser.Evaluate());
+
+            parser = new Parser("2 - 2 - 2 + 4 + 4 - 2 - 2");
+            res = 2 - 2 - 2 + 4 + 4 - 2 - 2;
+            Assert.Equal(res, parser.Evaluate());
+
+            parser = new Parser("2 * 2 * 2 * 2 / 2 / 2 / 2 * 4");
+            res = 2 * 2 * 2 * 2 / 2 / 2 / 2 * 4;
+            Assert.Equal(res, parser.Evaluate());
+
+            parser = new Parser("127 >> 1 >> 2 >> 3 << 4 << 3 >> 2 << 1");
+            res = 127 >> 1 >> 2 >> 3 << 4 << 3 >> 2 << 1;
+            Assert.Equal(res, parser.Evaluate());
+
+            parser = new Parser("127 ^ 42  ^ 55 ^ 66 ^ 77");
+            res = 127 ^ 42 ^ 55 ^ 66 ^ 77;
+            Assert.Equal(res, parser.Evaluate());
+
+            parser = new Parser("127 & 42  & 55 & 66 & 77");
+            res = 127 & 42 & 55 & 66 & 77;
+            Assert.Equal(res, parser.Evaluate());
+
+            parser = new Parser("0 | 42 | 55 | 66 | 77");
+            res = 0 | 42 | 55 | 66 | 77;
+            Assert.Equal(res, parser.Evaluate());
         }
     }
 }

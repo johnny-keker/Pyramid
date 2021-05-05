@@ -37,37 +37,41 @@ namespace Pyramid
         private Node Mul()
         {
             var node = Factor();
-
-            if (_lexer.TryReadChar('*'))
-                return new MulNode(node, Factor());
-            else if (_lexer.TryReadChar('/'))
-                return new DivNode(node, Factor());
-            else
-                return node;
+            while (true)
+            {
+                var mul = _lexer.TryReadChar('*');
+                var div = _lexer.TryReadChar('/');
+                if (!(mul || div)) return node;
+                node = mul
+                    ? (Node)new MulNode(node, Factor())
+                    : new DivNode(node, Factor());
+            }
         }
 
         private Node Sum()
         {
             var node = Mul();
-
-            if (_lexer.TryReadChar('+'))
-                return new PlusNode(node, Mul());
-            else if (_lexer.TryReadChar('-'))
-                return new MinusNode(node, Mul());
-            else
-                return node;
+            while (true)
+            {
+                var plus = _lexer.TryReadChar('+');
+                var minus = _lexer.TryReadChar('-');
+                if (!(plus || minus)) return node;
+                node = plus
+                    ? (Node)new PlusNode(node, Mul())
+                    : new MinusNode(node, Mul());
+            }
         }
 
         private Node Shift()
         {
             var node = Sum();
-
-            if (_lexer.TryReadChar('>') && _lexer.TryReadChar('>'))
-                return new BitwiseShiftNode(node, Sum());
-            else if (_lexer.TryReadChar('<') && _lexer.TryReadChar('<'))
-                return new BitwiseShiftNode(node, Sum(), false);
-            else
-                return node;
+            while (true)
+            {
+                var right = _lexer.TryReadChar('>') && _lexer.TryReadChar('>');
+                var left = _lexer.TryReadChar('<') && _lexer.TryReadChar('<');
+                if (!(right || left)) return node;
+                node = new BitwiseShiftNode(node, Sum(), right);
+            }
         }
 
         private Node And()
